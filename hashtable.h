@@ -19,6 +19,11 @@ typedef struct {
 */
 hash_table* new_hash_table(void);
 
+/*
+    Frees the memory taken up by the hash table, but not the data it stores.
+*/
+void free_hash_table(hash_table* table);
+
 /* 
    Adds the given key-data mapping to the table. If the key already exists,
    the old data is replaced (but not freed -- we do not assume the given

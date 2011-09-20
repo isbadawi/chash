@@ -14,7 +14,7 @@ int hash(char *str)
     return hash % HASH_SIZE;
 }
 
-entry* new_entry(char* key, void *data)
+static entry* new_entry(char* key, void *data)
 {
     entry* new_entry = (entry*)malloc(sizeof(entry));
     new_entry->key = (char*)malloc(strlen(key) + 1);
@@ -24,6 +24,17 @@ entry* new_entry(char* key, void *data)
     return new_entry;
 }
 
+static void free_entry(entry* e)
+{
+    while (e->next != NULL)
+    {
+        entry* temp = e;
+        e = e->next;
+        free(temp->key);
+        free(temp);
+    }
+}
+
 hash_table* new_hash_table(void)
 {
     hash_table* table = (hash_table*)malloc(sizeof(hash_table));
@@ -31,6 +42,15 @@ hash_table* new_hash_table(void)
     for (i = 0; i < HASH_SIZE; ++i)
         table->table[i] = NULL;
     return table;
+}
+
+void free_hash_table(hash_table* table)
+{
+    int i;
+    for (i = 0; i < HASH_SIZE; ++i)
+        if (table->table[i] != NULL)
+            free_entry(table->table[i]);
+    free(table);
 }
 
 void put(hash_table* table, char* key, void* data)
