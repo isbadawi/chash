@@ -45,12 +45,25 @@ char* test_put_same_key_twice(void)
     return 0;
 }
 
+char* test_delete_key(void)
+{
+    hash_table* table = new_hash_table();
+    int x = 4;
+    put(table, "x", &x);
+    del(table, "x");
+    void* data = get(table, "x");
+    mu_assert("table return non-NULL for deleted key", data == NULL);
+    free_hash_table(table);
+    return 0;
+}
+
 char* run_tests(void)
 {
     mu_run_test(test_new_hash_table);
     mu_run_test(test_get_missing_key);
     mu_run_test(test_get_existing_key);
     mu_run_test(test_put_same_key_twice);
+    mu_run_test(test_delete_key);
     return 0;
 }
 

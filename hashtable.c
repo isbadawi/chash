@@ -88,6 +88,32 @@ void* get(hash_table* table, char* key)
     return NULL;
 }
 
+void del(hash_table* table, char* key)
+{
+    int hashed_key = hash(key);
+    entry* head = table->table[hashed_key];
+    if (head == NULL)
+        return;
+    if (!strcmp(head->key, key))
+    {
+        free(head->key);
+        table->table[hashed_key] = head->next;
+        free(head);
+        return;
+    }
+    entry* prev = head;
+    for (head = head->next; head != NULL; head = head->next)
+    {
+        if (!strcmp(head->key, key))
+        {
+            free(head->key);
+            prev->next = head->next;
+            free(head);
+        }
+        prev = head;
+    }
+}
+
 void pretty_print(hash_table* table)
 {
 }
