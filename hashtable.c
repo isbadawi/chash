@@ -14,12 +14,6 @@ int hash(char *str)
     return hash % HASH_SIZE;
 }
 
-typedef struct entry {
-    char* key;
-    void *data;
-    struct entry* next;
-} entry;
-
 entry* new_entry(char* key, void *data)
 {
     entry* new_entry = (entry*)malloc(sizeof(entry));
@@ -42,9 +36,9 @@ hash_table* new_hash_table(void)
 void put(hash_table* table, char* key, void* data)
 {
     int hashed_key = hash(key);
-    entry* head = table->table[key];
+    entry* head = table->table[hashed_key];
     if (head == NULL)
-        table->table[key] = new_entry(key, data);
+        table->table[hashed_key] = new_entry(key, data);
     else
     {
         int exists = 0;
@@ -60,7 +54,7 @@ void put(hash_table* table, char* key, void* data)
         {
             entry* e = new_entry(key, data);
             e->next = head;
-            table->table[key] = e;
+            table->table[hashed_key] = e;
         }
     }
 }

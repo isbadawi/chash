@@ -10,9 +10,9 @@ typedef struct entry {
     struct entry* next;
 } entry;
 
-typedef struct hash_table {
+typedef struct {
     entry* table[HASH_SIZE]; 
-};
+} hash_table;
 
 /* 
    Creates an empty hash table.
@@ -36,7 +36,7 @@ void* get(hash_table* table, char* key);
    Removes the mapping with the given key from the hash table. If the key
    didn't exist, does nothing.
 */
-void del(hash_table* key, char* key);
+void del(hash_table* table, char* key);
 
 /*
    Returns a pretty python-like representation of the hash table. Useful for
