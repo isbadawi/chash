@@ -41,6 +41,7 @@ chash* chash_new(void)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
         table->table[i] = NULL;
+    table->size = 0;
     return table;
 }
 
@@ -58,7 +59,10 @@ void* chash_put(chash* table, char* key, void* data)
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
     if (head == NULL)
+    {
         table->table[hashed_key] = new_entry(key, data);
+        table->size += 1;
+    }
     else
     {
         entry* i;
@@ -72,6 +76,7 @@ void* chash_put(chash* table, char* key, void* data)
         entry* e = new_entry(key, data);
         e->next = head;
         table->table[hashed_key] = e;
+        table->size += 1;
     }
     return NULL;
 }
@@ -95,6 +100,7 @@ void* chash_del(chash* table, char* key)
     {
         free(head->key);
         table->table[hashed_key] = head->next;
+        table->size -= 1;
         void *data = head->data;
         free(head);
         return data;
@@ -106,6 +112,7 @@ void* chash_del(chash* table, char* key)
         {
             free(head->key);
             prev->next = head->next;
+            table->size -= 1;
             void *data = head->data;
             free(head);
             return data;

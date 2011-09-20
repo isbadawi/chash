@@ -2,7 +2,7 @@
 #define HASHTABLE_9IG3QKD1
 
 #define HASH_SIZE 1009 /* smallest prime > 1000 */
-#define CHASH_GET_AS(type, table, key) *((type*)chash_get(table, key))
+#define CHASH_GET_AS(type, table, key) ((type*)chash_get(table, key))
 
 /* TODO: Figure out a way not to have this in the header file? */
 typedef struct entry {
@@ -13,6 +13,7 @@ typedef struct entry {
 
 typedef struct {
     entry* table[HASH_SIZE]; 
+    int size;
 } chash;
 
 /* 

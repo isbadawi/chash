@@ -19,6 +19,7 @@ void tear_down(void)
 char* test_new_chash(void)
 {
     mu_assert("chash_new returns NULL", table != NULL);
+    mu_assert("chash_new returns table with non-zero size", table->size == 0);
     return 0;
 }
 
@@ -34,7 +35,7 @@ char* test_get_existing_key(void)
     int x = 4;
     void* exists = chash_put(table, "x", &x);
     mu_assert("chash_put returns non-NULL for new key", exists == NULL);
-    int data = CHASH_GET_AS(int, table, "x");
+    int data = *CHASH_GET_AS(int, table, "x");
     mu_assert("chash_get returns wrong data for key", data == 4);
     return 0;
 }
@@ -46,7 +47,7 @@ char* test_put_same_key_twice(void)
     chash_put(table, "x", &x1);
     void* old = chash_put(table, "x", &x2);
     mu_assert("chash_put does not return old data", *((int*)old) == 4);
-    int data = CHASH_GET_AS(int, table, "x");
+    int data = *CHASH_GET_AS(int, table, "x");
     mu_assert("chash_get returns wrong data for duplicate key", data == 5);
     return 0;
 }
