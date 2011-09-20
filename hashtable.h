@@ -43,10 +43,4 @@ void* get(hash_table* table, char* key);
 */
 void del(hash_table* table, char* key);
 
-/*
-   Returns a pretty python-like representation of the hash table. Useful for
-   debugging purposes.
-*/
-void pretty_print(hash_table* table);
-
 #endif 
