@@ -2,6 +2,7 @@
 #define HASHTABLE_9IG3QKD1
 
 #define HASH_SIZE 1009 /* smallest prime > 1000 */
+#define GET_AS(type, table, key) *((type*)get(table, key))
 
 /* TODO: Figure out a way not to have this in the header file? */
 typedef struct entry {

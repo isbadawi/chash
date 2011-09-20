@@ -26,7 +26,7 @@ char* test_get_existing_key(void)
     hash_table* table = new_hash_table();
     int x = 4;
     put(table, "x", &x);
-    int data = *((int*)get(table, "x"));
+    int data = GET_AS(int, table, "x");
     mu_assert("table returns wrong data for key", data == 4);
     free_hash_table(table);
     return 0;
@@ -39,7 +39,7 @@ char* test_put_same_key_twice(void)
     int x2 = 5;
     put(table, "x", &x1);
     put(table, "x", &x2);
-    int data = *((int*)get(table, "x"));
+    int data = GET_AS(int, table, "x");
     mu_assert("table returns wrong data for duplicate key", data == 5);
     free_hash_table(table);
     return 0;

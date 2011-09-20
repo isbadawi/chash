@@ -3,8 +3,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define HASH_SIZE 1009 /* smallest prime > 1000 */
-
 int hash(char *str)
 {
     unsigned long hash= 5381;
