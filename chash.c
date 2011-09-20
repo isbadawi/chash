@@ -1,5 +1,5 @@
 /* Hash table, mapping strings to void pointers. */
-#include"hashtable.h"
+#include"chash.h"
 #include<stdlib.h>
 #include<string.h>
 
@@ -32,17 +32,17 @@ static void free_entry(entry* e)
         free(temp);
     }
 }
-
-hash_table* new_hash_table(void)
+  
+chash* chash_new(void)
 {
-    hash_table* table = (hash_table*)malloc(sizeof(hash_table));
+    chash* table = (chash*)malloc(sizeof(chash));
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
         table->table[i] = NULL;
     return table;
 }
 
-void free_hash_table(hash_table* table)
+void chash_free(chash* table)
 {
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
@@ -51,7 +51,7 @@ void free_hash_table(hash_table* table)
     free(table);
 }
 
-void put(hash_table* table, char* key, void* data)
+void chash_put(chash* table, char* key, void* data)
 {
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
@@ -77,7 +77,7 @@ void put(hash_table* table, char* key, void* data)
     }
 }
 
-void* get(hash_table* table, char* key)
+void* chash_get(chash* table, char* key)
 {
     entry* head;
     for (head = table->table[hash(key)]; head != NULL; head = head->next)
@@ -86,7 +86,7 @@ void* get(hash_table* table, char* key)
     return NULL;
 }
 
-void del(hash_table* table, char* key)
+void chash_del(chash* table, char* key)
 {
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
@@ -110,8 +110,4 @@ void del(hash_table* table, char* key)
         }
         prev = head;
     }
-}
-
-void pretty_print(hash_table* table)
-{
 }
