@@ -21,9 +21,10 @@ typedef struct {
 chash* chash_new(void);
 
 /*
-    Frees the memory taken up by the hash table, but not the data it stores.
+    Frees the memory taken up by the hash table.
+    If free_data is true, also frees the data stored.
 */
-void chash_free(chash* table);
+void chash_free(chash* table, int free_data);
 
 /* 
    Adds the given key-data mapping to the table. If the key already exists,

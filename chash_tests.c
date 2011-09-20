@@ -13,7 +13,7 @@ void set_up(void)
 
 void tear_down(void)
 {
-    chash_free(table);
+    chash_free(table, 0);
 }
 
 char* test_new_chash(void)

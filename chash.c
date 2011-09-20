@@ -22,13 +22,15 @@ static entry* new_entry(char* key, void *data)
     return new_entry;
 }
 
-static void free_entry(entry* e)
+static void free_entry(entry* e, int free_data)
 {
     while (e->next != NULL)
     {
         entry* temp = e;
         e = e->next;
         free(temp->key);
+        if (free_data)
+            free(temp->data);
         free(temp);
     }
 }
@@ -42,12 +44,12 @@ chash* chash_new(void)
     return table;
 }
 
-void chash_free(chash* table)
+void chash_free(chash* table, int free_data)
 {
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
         if (table->table[i] != NULL)
-            free_entry(table->table[i]);
+            free_entry(table->table[i], free_data);
     free(table);
 }
 
