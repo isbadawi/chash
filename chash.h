@@ -47,4 +47,9 @@ void* chash_get(chash* table, char* key);
 */
 void* chash_del(chash* table, char* key);
 
+/*
+   Returns an array of size table->size, containing all the keys in the table.
+*/
+char** chash_keys(chash* table);
+
 #endif 

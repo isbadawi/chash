@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<string.h>
 #include "minunit.h"
 #include "chash.h"
 
@@ -60,5 +61,27 @@ char* test_delete_key(void)
     void* data = chash_get(table, "x");
     mu_assert("chash_del does not return deleted data", *((int*)del) == 4);
     mu_assert("chash_get return non-NULL for deleted key", data == NULL);
+    return 0;
+}
+
+int array_contains(char* str, char** array, int size)
+{
+    while (size--)
+        if (!strcmp(array[size], str))
+            return 1;
+    return 0;
+}
+
+char* test_get_all_keys(void)
+{
+    int x = 4;
+    char y = 'a';
+    chash_put(table, "x", &x);
+    chash_put(table, "y", &y);
+    chash_put(table, "test", "test");
+    char** keys = chash_keys(table);
+    mu_assert("chash_keys is missing a key", array_contains("x", keys, 3));
+    mu_assert("chash_keys is missing a key", array_contains("y", keys, 3));
+    mu_assert("chash_keys is missing a key", array_contains("test", keys, 3));
     return 0;
 }

@@ -121,3 +121,21 @@ void* chash_del(chash* table, char* key)
     }
     return NULL;
 }
+
+char** chash_keys(chash* table)
+{
+    char** keys = (char**)malloc(table->size * sizeof(char*));
+    int key = 0;
+    int i;
+    for (i = 0; i < HASH_SIZE; ++i)
+    {
+        entry* head;
+        for (head = table->table[i]; head != NULL; head = head->next)
+        {
+            keys[key] = (char*)malloc(strlen(head->key + 1));
+            strcpy(keys[key], head->key);
+            key++;
+        }
+    }
+    return keys;
+}
