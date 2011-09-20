@@ -39,9 +39,10 @@ void chash_put(chash* table, char* key, void *data);
 void* chash_get(chash* table, char* key);
 
 /*
-   Removes the mapping with the given key from the hash table. If the key
-   didn't exist, does nothing.
+   Removes the mapping with the given key from the hash table, and returns
+   the data (freeing it is up to the caller). If the key didn't exist, 
+   return NULL.
 */
-void chash_del(chash* table, char* key);
+void* chash_del(chash* table, char* key);
 
 #endif 

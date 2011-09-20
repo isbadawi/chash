@@ -53,8 +53,9 @@ char* test_delete_key(void)
 {
     int x = 4;
     chash_put(table, "x", &x);
-    chash_del(table, "x");
+    void* del = chash_del(table, "x");
     void* data = chash_get(table, "x");
+    mu_assert("chash_del does not return deleted data", *((int*)del) == 4);
     mu_assert("table return non-NULL for deleted key", data == NULL);
     return 0;
 }
