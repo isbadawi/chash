@@ -32,7 +32,8 @@ char* test_get_missing_key(void)
 char* test_get_existing_key(void)
 {
     int x = 4;
-    chash_put(table, "x", &x);
+    void* exists = chash_put(table, "x", &x);
+    mu_assert("chash_put returns non-NULL for new key", exists == NULL);
     int data = CHASH_GET_AS(int, table, "x");
     mu_assert("table returns wrong data for key", data == 4);
     return 0;
@@ -43,7 +44,8 @@ char* test_put_same_key_twice(void)
     int x1 = 4;
     int x2 = 5;
     chash_put(table, "x", &x1);
-    chash_put(table, "x", &x2);
+    void* old = chash_put(table, "x", &x2);
+    mu_assert("chash_put does not return old data", *((int*)old) == 4);
     int data = CHASH_GET_AS(int, table, "x");
     mu_assert("table returns wrong data for duplicate key", data == 5);
     return 0;

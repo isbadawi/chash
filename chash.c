@@ -51,7 +51,7 @@ void chash_free(chash* table)
     free(table);
 }
 
-void chash_put(chash* table, char* key, void* data)
+void* chash_put(chash* table, char* key, void* data)
 {
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
@@ -59,22 +59,19 @@ void chash_put(chash* table, char* key, void* data)
         table->table[hashed_key] = new_entry(key, data);
     else
     {
-        int exists = 0;
         entry* i;
         for (i = head; i != NULL; i = i->next)
             if (!(strcmp(i->key, key)))
             {
-                exists = 1;
+                void *temp = i->data;
                 i->data = data;
-                break;
+                return temp;
             }
-        if (!exists)
-        {
-            entry* e = new_entry(key, data);
-            e->next = head;
-            table->table[hashed_key] = e;
-        }
+        entry* e = new_entry(key, data);
+        e->next = head;
+        table->table[hashed_key] = e;
     }
+    return NULL;
 }
 
 void* chash_get(chash* table, char* key)

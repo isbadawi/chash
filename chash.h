@@ -27,10 +27,10 @@ void chash_free(chash* table);
 
 /* 
    Adds the given key-data mapping to the table. If the key already exists,
-   the old data is replaced (but not freed -- we do not assume the given
-   pointers come from malloc.)
+   the old data is replaced -- the old data is returned in case the caller
+   wants to free it. If the key is new, returns NULL.
 */
-void chash_put(chash* table, char* key, void *data);
+void* chash_put(chash* table, char* key, void *data);
 
 /* 
    Returns the data associated with the given key, or NULL if the key does not
