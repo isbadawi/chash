@@ -1,4 +1,4 @@
-#include "hashtable_tests.c"
+#include "chash_tests.c"
 
 char* run_tests(void)
 {
