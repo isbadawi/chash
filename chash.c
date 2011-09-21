@@ -60,8 +60,11 @@ void chash_free(chash* table)
 {
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
+    {
         if (table->table[i]->next != NULL)
             free_chash_entry(table->table[i]->next, table->free);
+        free(table->table[i]);
+    }
     free(table);
 }
 
