@@ -85,3 +85,24 @@ char* test_get_all_keys(void)
     mu_assert("chash_keys is missing a key", array_contains("test", keys, 3));
     return 0;
 }
+
+char* test_get_all_keys_and_values(void)
+{
+    int x = 4;
+    int y = 5;
+    int test = 6;
+    chash_put(table, "x", &x);
+    chash_put(table, "y", &y);
+    chash_put(table, "test", &test);
+    char** keys = chash_keys(table);    
+    void** values = chash_values(table);
+    int i;
+    for (i = 0; i < table->size; ++i)
+    {
+        int expected_val = *((int*)values[i]);
+        int actual_val = *CHASH_GET_AS(int, table, keys[i]);
+        mu_assert("chash_keys and chash_values don't return items in the same"
+                  "order", expected_val == actual_val);
+    }
+    return 0;
+}

@@ -11,6 +11,11 @@ typedef struct entry {
     struct entry* next;
 } entry;
 
+/*
+    The main hash table structure. You'd do best to treat this as an opaque
+    structure -- you might run into trouble if you mess with the fields
+    directly (feel free to read the size field though!).
+*/
 typedef struct {
     entry* table[HASH_SIZE]; 
     int size;
@@ -48,8 +53,15 @@ void* chash_get(chash* table, char* key);
 void* chash_del(chash* table, char* key);
 
 /*
-   Returns an array of size table->size, containing all the keys in the table.
+   Returns an array of size table->size, containing all the keys in the table
+   (in the same order as that returned by chash_values).
 */
 char** chash_keys(chash* table);
+
+/*
+   Returns an array of size table->size, containing all the value in the table
+   (in the same order as that returned by chash_keys).
+*/
+void** chash_values(chash* table);
 
 #endif 

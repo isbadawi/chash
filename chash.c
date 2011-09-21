@@ -139,3 +139,20 @@ char** chash_keys(chash* table)
     }
     return keys;
 }
+
+void** chash_values(chash* table)
+{
+    void** values = (void**)malloc(table->size * sizeof(void*));
+    int value = 0;
+    int i;
+    for (i = 0; i < HASH_SIZE; ++i)
+    {
+        entry* head;
+        for (head = table->table[i]; head != NULL; head = head->next)
+        {
+            values[value] = head->data;
+            value++;
+        }
+    }
+    return values;
+}      
