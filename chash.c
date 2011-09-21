@@ -17,21 +17,21 @@ static void default_free(void* p)
     return;
 }
 
-static entry* new_entry(char* key, void *data)
+static chash_entry* new_chash_entry(char* key, void *data)
 {
-    entry* new_entry = (entry*)malloc(sizeof(entry));
-    new_entry->key = (char*)malloc(strlen(key) + 1);
-    strcpy(new_entry->key, key);
-    new_entry->data = data;
-    new_entry->next = NULL; 
-    return new_entry;
+    chash_entry* new_chash_entry = (chash_entry*)malloc(sizeof(chash_entry));
+    new_chash_entry->key = (char*)malloc(strlen(key) + 1);
+    strcpy(new_chash_entry->key, key);
+    new_chash_entry->data = data;
+    new_chash_entry->next = NULL; 
+    return new_chash_entry;
 }
 
-static void free_entry(entry* e, chash_callback_t* on_free)
+static void free_chash_entry(chash_entry* e, chash_callback_t* on_free)
 {
     while (e->next != NULL)
     {
-        entry* temp = e;
+        chash_entry* temp = e;
         e = e->next;
         free(temp->key);
         on_free(temp->data);
@@ -55,22 +55,22 @@ void chash_free(chash* table)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
         if (table->table[i] != NULL)
-            free_entry(table->table[i], table->free);
+            free_chash_entry(table->table[i], table->free);
     free(table);
 }
 
 void chash_put(chash* table, char* key, void* data)
 {
     int hashed_key = hash(key);
-    entry* head = table->table[hashed_key];
+    chash_entry* head = table->table[hashed_key];
     if (head == NULL)
     {
-        table->table[hashed_key] = new_entry(key, data);
+        table->table[hashed_key] = new_chash_entry(key, data);
         table->size += 1;
     }
     else
     {
-        entry* i;
+        chash_entry* i;
         for (i = head; i != NULL; i = i->next)
             if (!(strcmp(i->key, key)))
             {
@@ -78,7 +78,7 @@ void chash_put(chash* table, char* key, void* data)
                 i->data = data;
                 table->free(temp);
             }
-        entry* e = new_entry(key, data);
+        chash_entry* e = new_chash_entry(key, data);
         e->next = head;
         table->table[hashed_key] = e;
         table->size += 1;
@@ -87,7 +87,7 @@ void chash_put(chash* table, char* key, void* data)
 
 void* chash_get(chash* table, char* key)
 {
-    entry* head;
+    chash_entry* head;
     for (head = table->table[hash(key)]; head != NULL; head = head->next)
         if (!strcmp(head->key, key))
             return head->data;
@@ -97,7 +97,7 @@ void* chash_get(chash* table, char* key)
 void chash_del(chash* table, char* key)
 {
     int hashed_key = hash(key);
-    entry* head = table->table[hashed_key];
+    chash_entry* head = table->table[hashed_key];
     if (head == NULL)
         return;
     if (!strcmp(head->key, key))
@@ -108,7 +108,7 @@ void chash_del(chash* table, char* key)
         table->free(head->data);
         free(head);
     }
-    entry* prev = head;
+    chash_entry* prev = head;
     for (head = head->next; head != NULL; head = head->next)
     {
         if (!strcmp(head->key, key))
@@ -121,7 +121,6 @@ void chash_del(chash* table, char* key)
         }
         prev = head;
     }
-    return NULL;
 }
 
 char** chash_keys(chash* table)
@@ -131,7 +130,7 @@ char** chash_keys(chash* table)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
     {
-        entry* head;
+        chash_entry* head;
         for (head = table->table[i]; head != NULL; head = head->next)
         {
             keys[key] = (char*)malloc(strlen(head->key + 1));
@@ -149,7 +148,7 @@ void** chash_values(chash* table)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
     {
-        entry* head;
+        chash_entry* head;
         for (head = table->table[i]; head != NULL; head = head->next)
         {
             values[value] = head->data;
@@ -166,7 +165,7 @@ chash_item** chash_items(chash* table)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
     {
-        entry* head;
+        chash_entry* head;
         for (head = table->table[i]; head != NULL; head = head->next)
         {
             items[item] = (chash_item*)malloc(sizeof(chash_item));

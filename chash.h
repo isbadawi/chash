@@ -5,11 +5,11 @@
 #define CHASH_GET_AS(type, table, key) ((type*)chash_get(table, key))
 
 /* TODO: Figure out a way not to have this in the header file? */
-typedef struct entry {
+typedef struct chash_entry {
     char* key;
     void *data;
-    struct entry* next;
-} entry;
+    struct chash_entry* next;
+} chash_entry;
 
 typedef void (chash_callback_t) (void*);
 
@@ -20,7 +20,7 @@ typedef void (chash_callback_t) (void*);
 */
 typedef struct {
     /* The table proper. */
-    entry* table[HASH_SIZE]; 
+    chash_entry* table[HASH_SIZE]; 
     /* The size of the table. */
     unsigned long size;
     /* This function will be called whenever a value is deleted from the table
