@@ -106,3 +106,25 @@ char* test_get_all_keys_and_values(void)
     }
     return 0;
 }
+
+char* test_get_items(void)
+{
+    int x = 4;
+    int y = 5;
+    int test = 6;
+    chash_put(table, "x", &x);
+    chash_put(table, "y", &y);
+    chash_put(table, "test", &test);
+    char** keys = chash_keys(table);    
+    void** values = chash_values(table);
+    chash_item** items = chash_items(table);
+    int i; 
+    for (i = 0; i < table->size; ++i)
+    {
+        mu_assert("chash_items returns keys in wrong order", 
+                  !strcmp(items[i]->key, keys[i]));
+        mu_assert("chash_items returns values in wrong order",
+                  values[i] == items[i]->data);
+    }
+    return 0;
+}

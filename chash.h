@@ -21,6 +21,14 @@ typedef struct {
     int size;
 } chash;
 
+/*
+    Key-value pair -- the return type of chash_items. Useful e.g. for qsort.
+*/
+typedef struct {
+    char* key;
+    void *data;
+} chash_item;
+
 /* 
    Creates an empty hash table.
 */
@@ -63,5 +71,11 @@ char** chash_keys(chash* table);
    (in the same order as that returned by chash_keys).
 */
 void** chash_values(chash* table);
+
+/*
+    Returns an arrayof size table->size, containing all the key-value pairs in
+    the table (in the same order as that returned by chash_keys and so on.)
+*/
+chash_item** chash_items(chash* table);
 
 #endif 

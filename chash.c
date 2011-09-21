@@ -156,3 +156,23 @@ void** chash_values(chash* table)
     }
     return values;
 }      
+
+chash_item** chash_items(chash* table)
+{
+    chash_item** items = (chash_item**)malloc(table->size * sizeof(chash_item*));
+    int item = 0;
+    int i;
+    for (i = 0; i < HASH_SIZE; ++i)
+    {
+        entry* head;
+        for (head = table->table[i]; head != NULL; head = head->next)
+        {
+            items[item] = (chash_item*)malloc(sizeof(chash_item));
+            items[item]->key = (char*)malloc(strlen(head->key + 1));
+            strcpy(items[item]->key, head->key);
+            items[item]->data = head->data;
+            item++;
+        }
+    }
+    return items;
+}
