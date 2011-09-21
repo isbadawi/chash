@@ -11,14 +11,24 @@ typedef struct entry {
     struct entry* next;
 } entry;
 
+typedef void (chash_callback_t) (void*);
+
 /*
     The main hash table structure. You'd do best to treat this as an opaque
     structure -- you might run into trouble if you mess with the fields
     directly (feel free to read the size field though!).
 */
 typedef struct {
+    /* The table proper. */
     entry* table[HASH_SIZE]; 
-    int size;
+    /* The size of the table. */
+    unsigned long size;
+    /* This function will be called whenever a value is deleted from the table
+       -- a chash returned by chash_new will have this set to a no-op; you can
+       then set this directly. A typical value may be free from stdlib.h, or
+       a custom function.
+    */
+    chash_callback_t* free;
 } chash;
 
 /*
@@ -36,16 +46,14 @@ chash* chash_new(void);
 
 /*
     Frees the memory taken up by the hash table.
-    If free_data is true, also frees the data stored.
 */
-void chash_free(chash* table, int free_data);
+void chash_free(chash* table);
 
 /* 
-   Adds the given key-data mapping to the table. If the key already exists,
-   the old data is replaced -- the old data is returned in case the caller
-   wants to free it. If the key is new, returns NULL.
+   Adds the given key-data mapping to the table. 
+   If the key already existed in the table, the old data is deleted.
 */
-void* chash_put(chash* table, char* key, void *data);
+void chash_put(chash* table, char* key, void *data);
 
 /* 
    Returns the data associated with the given key, or NULL if the key does not
@@ -54,11 +62,9 @@ void* chash_put(chash* table, char* key, void *data);
 void* chash_get(chash* table, char* key);
 
 /*
-   Removes the mapping with the given key from the hash table, and returns
-   the data (freeing it is up to the caller). If the key didn't exist, 
-   return NULL.
+   Removes the mapping with the given key from the hash table.
 */
-void* chash_del(chash* table, char* key);
+void chash_del(chash* table, char* key);
 
 /*
    Returns an array of size table->size, containing all the keys in the table

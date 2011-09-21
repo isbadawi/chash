@@ -87,6 +87,6 @@ int main(int argc, char* argv[])
     int i;
     for (i = 0; i < table->size; ++i)
         printf("%s: %d\n", items[i]->key, *((int*)items[i]->data));
-    chash_free(table, 1);
+    chash_free(table);
     return 0;
 }

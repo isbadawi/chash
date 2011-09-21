@@ -12,6 +12,11 @@ static int hash(char *str)
     return hash % HASH_SIZE;
 }
 
+static void default_free(void* p)
+{
+    return;
+}
+
 static entry* new_entry(char* key, void *data)
 {
     entry* new_entry = (entry*)malloc(sizeof(entry));
@@ -22,15 +27,14 @@ static entry* new_entry(char* key, void *data)
     return new_entry;
 }
 
-static void free_entry(entry* e, int free_data)
+static void free_entry(entry* e, chash_callback_t* on_free)
 {
     while (e->next != NULL)
     {
         entry* temp = e;
         e = e->next;
         free(temp->key);
-        if (free_data)
-            free(temp->data);
+        on_free(temp->data);
         free(temp);
     }
 }
@@ -42,19 +46,20 @@ chash* chash_new(void)
     for (i = 0; i < HASH_SIZE; ++i)
         table->table[i] = NULL;
     table->size = 0;
+    table->free = default_free;
     return table;
 }
 
-void chash_free(chash* table, int free_data)
+void chash_free(chash* table)
 {
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
         if (table->table[i] != NULL)
-            free_entry(table->table[i], free_data);
+            free_entry(table->table[i], table->free);
     free(table);
 }
 
-void* chash_put(chash* table, char* key, void* data)
+void chash_put(chash* table, char* key, void* data)
 {
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
@@ -71,14 +76,13 @@ void* chash_put(chash* table, char* key, void* data)
             {
                 void *temp = i->data;
                 i->data = data;
-                return temp;
+                table->free(temp);
             }
         entry* e = new_entry(key, data);
         e->next = head;
         table->table[hashed_key] = e;
         table->size += 1;
     }
-    return NULL;
 }
 
 void* chash_get(chash* table, char* key)
@@ -90,7 +94,7 @@ void* chash_get(chash* table, char* key)
     return NULL;
 }
 
-void* chash_del(chash* table, char* key)
+void chash_del(chash* table, char* key)
 {
     int hashed_key = hash(key);
     entry* head = table->table[hashed_key];
@@ -101,9 +105,8 @@ void* chash_del(chash* table, char* key)
         free(head->key);
         table->table[hashed_key] = head->next;
         table->size -= 1;
-        void *data = head->data;
+        table->free(head->data);
         free(head);
-        return data;
     }
     entry* prev = head;
     for (head = head->next; head != NULL; head = head->next)
@@ -113,9 +116,8 @@ void* chash_del(chash* table, char* key)
             free(head->key);
             prev->next = head->next;
             table->size -= 1;
-            void *data = head->data;
+            table->free(head->data);
             free(head);
-            return data;
         }
         prev = head;
     }
