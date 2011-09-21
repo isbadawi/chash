@@ -78,6 +78,7 @@ void chash_put(chash* table, char* key, void* data)
                 void *temp = i->data;
                 i->data = data;
                 table->free(temp);
+                return;
             }
         chash_entry* e = new_chash_entry(key, data);
         e->next = head;
@@ -108,6 +109,7 @@ void chash_del(chash* table, char* key)
         table->size -= 1;
         table->free(head->data);
         free(head);
+        return;
     }
     chash_entry* prev = head;
     for (head = head->next; head != NULL; head = head->next)
@@ -119,6 +121,7 @@ void chash_del(chash* table, char* key)
             table->size -= 1;
             table->free(head->data);
             free(head);
+            return;
         }
         prev = head;
     }
