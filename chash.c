@@ -45,7 +45,12 @@ chash* chash_new(void)
     chash* table = (chash*)malloc(sizeof(chash));
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
-        table->table[i] = NULL;
+    {
+        table->table[i] = (chash_entry*)malloc(sizeof(chash_entry));
+        table->table[i]->key = NULL;
+        table->table[i]->data = NULL;
+        table->table[i]->next = NULL;
+    }
     table->size = 0;
     table->free = default_free;
     return table;
@@ -55,8 +60,8 @@ void chash_free(chash* table)
 {
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
-        if (table->table[i] != NULL)
-            free_chash_entry(table->table[i], table->free);
+        if (table->table[i]->next != NULL)
+            free_chash_entry(table->table[i]->next, table->free);
     free(table);
 }
 
@@ -64,33 +69,25 @@ void chash_put(chash* table, char* key, void* data)
 {
     int hashed_key = hash(key);
     chash_entry* head = table->table[hashed_key];
-    if (head == NULL)
-    {
-        table->table[hashed_key] = new_chash_entry(key, data);
-        table->size += 1;
-    }
-    else
-    {
-        chash_entry* i;
-        for (i = head; i != NULL; i = i->next)
-            if (!(strcmp(i->key, key)))
-            {
-                void *temp = i->data;
-                i->data = data;
-                table->free(temp);
-                return;
-            }
-        chash_entry* e = new_chash_entry(key, data);
-        e->next = head;
-        table->table[hashed_key] = e;
-        table->size += 1;
-    }
+    chash_entry* i;
+    for (i = head->next; i != NULL; i = i->next)
+        if (!(strcmp(i->key, key)))
+        {
+            void *temp = i->data;
+            i->data = data;
+            table->free(temp);
+            return;
+        }
+    chash_entry* e = new_chash_entry(key, data);
+    e->next = head->next;
+    head->next = e;
+    table->size += 1;
 }
 
 void* chash_get(chash* table, char* key)
 {
-    chash_entry* head;
-    for (head = table->table[hash(key)]; head != NULL; head = head->next)
+    chash_entry* head = table->table[hash(key)]->next;
+    for (; head != NULL; head = head->next)
         if (!strcmp(head->key, key))
             return head->data;
     return NULL;
@@ -100,17 +97,6 @@ void chash_del(chash* table, char* key)
 {
     int hashed_key = hash(key);
     chash_entry* head = table->table[hashed_key];
-    if (head == NULL)
-        return;
-    if (!strcmp(head->key, key))
-    {
-        free(head->key);
-        table->table[hashed_key] = head->next;
-        table->size -= 1;
-        table->free(head->data);
-        free(head);
-        return;
-    }
     chash_entry* prev = head;
     for (head = head->next; head != NULL; head = head->next)
     {
@@ -135,7 +121,7 @@ char** chash_keys(chash* table)
     for (i = 0; i < HASH_SIZE; ++i)
     {
         chash_entry* head;
-        for (head = table->table[i]; head != NULL; head = head->next)
+        for (head = table->table[i]->next; head != NULL; head = head->next)
         {
             keys[key] = (char*)malloc(strlen(head->key + 1));
             strcpy(keys[key], head->key);
@@ -153,7 +139,7 @@ void** chash_values(chash* table)
     for (i = 0; i < HASH_SIZE; ++i)
     {
         chash_entry* head;
-        for (head = table->table[i]; head != NULL; head = head->next)
+        for (head = table->table[i]->next; head != NULL; head = head->next)
         {
             values[value] = head->data;
             value++;
@@ -170,7 +156,7 @@ chash_item** chash_items(chash* table)
     for (i = 0; i < HASH_SIZE; ++i)
     {
         chash_entry* head;
-        for (head = table->table[i]; head != NULL; head = head->next)
+        for (head = table->table[i]->next; head != NULL; head = head->next)
         {
             items[item] = (chash_item*)malloc(sizeof(chash_item));
             items[item]->key = (char*)malloc(strlen(head->key + 1));
