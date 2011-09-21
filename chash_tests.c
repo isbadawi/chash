@@ -135,3 +135,13 @@ char* test_get_items(void)
     }
     return 0;
 }
+
+char* test_put_put_del_put(void)
+{
+    chash_put(table, "x", "test");
+    chash_put(table, "x", "test2");
+    chash_del(table, "x");
+    chash_put(table, "x", "newval");
+    mu_assert("put_put_del_put should entail 2 deletes", items_deleted == 2);
+    return 0;
+}
