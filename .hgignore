@@ -2,4 +2,4 @@ syntax: glob
 *.o
 *.swp
 *.orig
-examples/words
+examples/bin

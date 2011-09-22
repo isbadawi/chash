@@ -1,5 +1,5 @@
 /* The standard "read a file and sort its words by frequency" exercise. */
-#include"chash.h"
+#include"../../chash.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
