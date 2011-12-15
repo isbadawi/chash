@@ -45,7 +45,7 @@ typedef struct {
 chash* chash_new(void);
 
 /*
-    Frees the memory taken up by the hash table.
+   Frees the memory taken up by the hash table.
 */
 void chash_free(chash* table);
 
@@ -79,11 +79,15 @@ char** chash_keys(chash* table);
 void** chash_values(chash* table);
 
 /*
-    Returns an arrayof size table->size, containing all the key-value pairs in
-    the table (in the same order as that returned by chash_keys and so on.)
+   Returns an array of size table->size, containing all the key-value pairs in
+   the table (in the same order as that returned by chash_keys and so on.)
 */
 chash_item** chash_items(chash* table);
 
+/*
+   Prints (to stdout) a representation of this table. The print_item callback
+   is called on each item (that is, with the void pointer) to print it out.
+*/
 void chash_pretty_print(chash* table, chash_callback_t* print_item);
 
 #endif 
