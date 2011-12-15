@@ -93,9 +93,20 @@ void* chash_get(chash* table, char* key)
     return NULL;
 }
 
-int chash_contains(chash* table, char *key)
+int chash_contains_key(chash* table, char *key)
 {
     return chash_get(table, key) != NULL;
+}
+
+int chash_contains_value(chash* table, void *data)
+{
+    void** values = chash_values(table);
+    int i;
+    for (i = 0; i < table->size; ++i)
+        if (values[i] == data)
+            break;
+    free(values);
+    return i < table->size;
 }
 
 void chash_del(chash* table, char* key)

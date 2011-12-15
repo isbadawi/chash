@@ -34,7 +34,8 @@ char* test_new_chash(void)
 
 char* test_get_missing_key(void)
 {
-    mu_assert("chash_get returns non-NULL for missing key", !chash_contains(table, "nosuchkey"));
+    void *data = chash_get(table, "nosuchkey");
+    mu_assert("chash_get returns non-NULL for missing key", data == NULL);
     return 0;
 }
 
@@ -65,8 +66,17 @@ char* test_delete_key(void)
     chash_put(table, "x", &x);
     chash_del(table, "x");
     mu_assert("chash_del doesn't delete data", items_deleted == 1);
-    void* data = chash_get(table, "x");
-    mu_assert("chash_get return non-NULL for deleted key", !chash_contains(table, "x"));
+    mu_assert("chash_del doesn't remove mapping", !chash_contains_key(table, "x"));
+    return 0;
+}
+
+char* test_contains(void)
+{
+    mu_assert("chash_contains_key returns 1 for missing key", !chash_contains_key(table, "x"));
+    mu_assert("chash_contains_value returns 1 for missing value", !chash_contains_value(table, "somestring"));
+    chash_put(table, "x", "somestring");
+    mu_assert("chash_contains_key returns 0 for existing key", chash_contains_key(table, "x"));
+    mu_assert("chash_contains_value returns 0 for existing value", chash_contains_value(table, "somestring"));
     return 0;
 }
 
