@@ -137,6 +137,7 @@ void chash_update(chash* dest, chash* src)
         chash_put(dest, items[i]->key, items[i]->data);
         free(items[i]);
     }
+    free(items);
 }
 
 chash* chash_copy(chash *table)
@@ -205,5 +206,6 @@ void chash_pretty_print(chash* table, chash_callback_t* print_item)
         printf("\n");
         free(items[i]);
     }
+    free(items);
     printf("}");
 }
