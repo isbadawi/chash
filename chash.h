@@ -11,7 +11,8 @@ typedef struct chash_entry {
     struct chash_entry* next;
 } chash_entry;
 
-typedef void (chash_callback_t) (void*);
+typedef void  (chash_callback_t) (void*);
+typedef char* (chash_tostring_t) (void*);
 
 /*
     The main hash table structure. You'd do best to treat this as an opaque
@@ -106,9 +107,10 @@ void** chash_values(chash* table);
 chash_item** chash_items(chash* table);
 
 /*
-   Prints (to stdout) a representation of this table. The print_item callback
-   is called on each item (that is, with the void pointer) to print it out.
+   Returns a string representation of this table. The to_string callback
+   is called on each item (that is, with the void pointer), to turn it into
+   a string. This string is freed at the end.
 */
-void chash_pretty_print(chash* table, chash_callback_t* print_item);
+char* chash_to_string(chash* table, chash_tostring_t* to_string);
 
 #endif 

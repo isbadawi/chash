@@ -126,6 +126,7 @@ void chash_clear(chash* table)
     int size = table->size;
     for (i = 0; i < size; ++i)
         chash_del(table, keys[i]);
+    free(keys);
 }
 
 void chash_update(chash* dest, chash* src)
@@ -192,20 +193,35 @@ chash_item** chash_items(chash* table)
     return items;
 }
 
-void chash_pretty_print(chash* table, chash_callback_t* print_item)
+char* chash_to_string(chash* table, chash_tostring_t* to_string)
 {
-    printf("{\n");
-    chash_item** items = chash_items(table);
+    char** keys = chash_keys(table);
+    void** values = chash_values(table);
+    char** strings = (char**)malloc(table->size * sizeof(char*));
+    int length = 0;
     int i;
     for (i = 0; i < table->size; ++i)
     {
-        printf("    \"%s\": ", items[i]->key);
-        print_item(items[i]->data);
-        if (i < table->size - 1)
-            printf(",");
-        printf("\n");
-        free(items[i]);
+        strings[i] = to_string(values[i]);
+        length += strlen(keys[i]);
+        length += strlen(strings[i]);
+        length += 6; /* quotes for the key, colon & space separators, comma, space */
     }
-    free(items);
-    printf("}");
+    /* -2 for the trailing comma & space, +2 for the braces */
+
+    char *result = (char*)malloc(length + 1);
+
+    strcpy(result, "{");
+    int from = 1;
+    for (i = 0; i < table->size; ++i)
+    {
+        from += sprintf(result + from, "\"%s\": %s", keys[i], strings[i]);    
+        if (i != table->size - 1)
+            from += sprintf(result + from, ", ");
+        free(strings[i]);
+    }
+    strcpy(result + from, "}");
+    free(keys);
+    free(values);
+    return result;
 }
