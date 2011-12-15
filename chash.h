@@ -78,6 +78,11 @@ void chash_del(chash* table, char* key);
 void chash_clear(chash* table);
 
 /*
+   Updates dest with the mappings from src, overwriting existing mappings.
+*/
+void chash_update(chash* dest, chash* src);
+
+/*
    Creates a copy of the given table.
 */
 chash* chash_copy(chash* table);

@@ -128,16 +128,21 @@ void chash_clear(chash* table)
         chash_del(table, keys[i]);
 }
 
-chash* chash_copy(chash *table)
+void chash_update(chash* dest, chash* src)
 {
-    chash_item **items = chash_items(table);
-    chash* result = chash_new();
+    chash_item **items = chash_items(src);
     int i;
-    for (i = 0; i < table->size; ++i)
+    for (i = 0; i < src->size; ++i)
     {
-        chash_put(result, items[i]->key, items[i]->data);
+        chash_put(dest, items[i]->key, items[i]->data);
         free(items[i]);
     }
+}
+
+chash* chash_copy(chash *table)
+{
+    chash* result = chash_new();
+    chash_update(result, table);
     return result;
 }
 
