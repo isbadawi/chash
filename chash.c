@@ -93,6 +93,11 @@ void* chash_get(chash* table, char* key)
     return NULL;
 }
 
+int chash_contains(chash* table, char *key)
+{
+    return chash_get(table, key) != NULL;
+}
+
 void chash_del(chash* table, char* key)
 {
     int hashed_key = hash(key);

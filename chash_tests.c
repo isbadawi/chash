@@ -34,8 +34,7 @@ char* test_new_chash(void)
 
 char* test_get_missing_key(void)
 {
-    void *data = chash_get(table, "nosuchkey");
-    mu_assert("chash_get returns non-NULL for missing key", data == NULL);
+    mu_assert("chash_get returns non-NULL for missing key", !chash_contains(table, "nosuchkey"));
     return 0;
 }
 
@@ -67,7 +66,7 @@ char* test_delete_key(void)
     chash_del(table, "x");
     mu_assert("chash_del doesn't delete data", items_deleted == 1);
     void* data = chash_get(table, "x");
-    mu_assert("chash_get return non-NULL for deleted key", data == NULL);
+    mu_assert("chash_get return non-NULL for deleted key", !chash_contains(table, "x"));
     return 0;
 }
 

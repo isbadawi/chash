@@ -62,6 +62,11 @@ void chash_put(chash* table, char* key, void *data);
 void* chash_get(chash* table, char* key);
 
 /*
+   Checks if the table contains the given key -- returns 1 if yes, 0 if not.
+*/
+int chash_contains(chash* table, char* key);
+
+/*
    Removes the mapping with the given key from the hash table.
 */
 void chash_del(chash* table, char* key);
