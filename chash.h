@@ -67,6 +67,17 @@ void* chash_get(chash* table, char* key);
 void chash_del(chash* table, char* key);
 
 /*
+   Removes every mapping from the hash_table. Equivalent to calling chash_del
+   on every key returned by chash_keys.
+*/
+void chash_clear(chash* table);
+
+/*
+   Creates a copy of the given table.
+*/
+chash* chash_copy(chash* table);
+
+/*
    Returns an array of size table->size, containing all the keys in the table
    (in the same order as that returned by chash_values).
 */

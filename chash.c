@@ -30,14 +30,12 @@ static chash_entry* new_chash_entry(char* key, void *data)
 
 static void free_chash_entry(chash_entry* e, chash_callback_t* on_free)
 {
-    while (e->next != NULL)
-    {
-        chash_entry* temp = e;
-        e = e->next;
-        free(temp->key);
-        on_free(temp->data);
-        free(temp);
-    }
+    if (e == NULL)
+        return;
+    free_chash_entry(e->next, on_free);
+    free(e->key);
+    on_free(e->data);
+    free(e);
 }
   
 chash* chash_new(void)
@@ -61,8 +59,7 @@ void chash_free(chash* table)
     int i;
     for (i = 0; i < HASH_SIZE; ++i)
     {
-        if (table->table[i]->next != NULL)
-            free_chash_entry(table->table[i]->next, table->free);
+        free_chash_entry(table->table[i]->next, table->free);
         free(table->table[i]);
     }
     free(table);
@@ -105,15 +102,38 @@ void chash_del(chash* table, char* key)
     {
         if (!strcmp(head->key, key))
         {
-            free(head->key);
             prev->next = head->next;
-            table->size -= 1;
+            free(head->key);
             table->free(head->data);
             free(head);
-            return;
+            table->size -= 1;
+            break;
         }
         prev = head;
     }
+}
+
+void chash_clear(chash* table) 
+{
+    char **keys = chash_keys(table);
+    int i;
+    /* chash_del modifies table->size */
+    int size = table->size;
+    for (i = 0; i < size; ++i)
+        chash_del(table, keys[i]);
+}
+
+chash* chash_copy(chash *table)
+{
+    chash_item **items = chash_items(table);
+    chash* result = chash_new();
+    int i;
+    for (i = 0; i < table->size; ++i)
+    {
+        chash_put(result, items[i]->key, items[i]->data);
+        free(items[i]);
+    }
+    return result;
 }
 
 char** chash_keys(chash* table)
@@ -173,9 +193,7 @@ void chash_pretty_print(chash* table, chash_callback_t* print_item)
         if (i < table->size - 1)
             printf(",");
         printf("\n");
+        free(items[i]);
     }
     printf("}");
-
-    for (i = 0; i < table->size; ++i) 
-        free(items[i]);
 }

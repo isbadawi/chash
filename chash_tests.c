@@ -145,3 +145,32 @@ char* test_put_put_del_put(void)
     mu_assert("put_put_del_put should entail 2 deletes", items_deleted == 2);
     return 0;
 }
+
+char* test_clear(void)
+{
+    chash_put(table, "x", "test");
+    chash_put(table, "y", "test");
+    chash_put(table, "z", "test");
+    chash_clear(table);
+    mu_assert("chash_clear doesn't remove every item", items_deleted == 3);
+    mu_assert("chash_clear doesn't leave the table empty", table->size == 0);
+    return 0;
+}
+
+char *test_copy(void)
+{
+    chash_put(table, "x", "test1");
+    chash_put(table, "y", "test2");
+    chash_put(table, "z", "test3");
+    chash* copy = chash_copy(table);
+    mu_assert("chash_copy doesn't preserve size", copy->size == table->size);
+    chash_item** original_items = chash_items(table);
+    chash_item** copied_items = chash_items(copy);
+    int i;
+    for (i = 0; i < table->size; ++i)
+        mu_assert("chash_copy doesn't preserve items", 
+                   !strcmp(original_items[i]->key, copied_items[i]->key) &&
+                   original_items[i]->data == copied_items[i]->data);
+
+    return 0;
+}
