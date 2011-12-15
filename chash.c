@@ -121,16 +121,10 @@ char** chash_keys(chash* table)
     char** keys = (char**)malloc(table->size * sizeof(char*));
     int key = 0;
     int i;
+    chash_entry* head;
     for (i = 0; i < HASH_SIZE; ++i)
-    {
-        chash_entry* head;
         for (head = table->table[i]->next; head != NULL; head = head->next)
-        {
-            keys[key] = (char*)malloc(strlen(head->key + 1));
-            strcpy(keys[key], head->key);
-            key++;
-        }
-    }
+            keys[key++] = head->key;
     return keys;
 }
 
@@ -143,10 +137,7 @@ void** chash_values(chash* table)
     {
         chash_entry* head;
         for (head = table->table[i]->next; head != NULL; head = head->next)
-        {
-            values[value] = head->data;
-            value++;
-        }
+            values[value++] = head->data;
     }
     return values;
 }      
@@ -162,8 +153,7 @@ chash_item** chash_items(chash* table)
         for (head = table->table[i]->next; head != NULL; head = head->next)
         {
             items[item] = (chash_item*)malloc(sizeof(chash_item));
-            items[item]->key = (char*)malloc(strlen(head->key + 1));
-            strcpy(items[item]->key, head->key);
+            items[item]->key = head->key;
             items[item]->data = head->data;
             item++;
         }
@@ -185,4 +175,7 @@ void chash_pretty_print(chash* table, chash_callback_t* print_item)
         printf("\n");
     }
     printf("}");
+
+    for (i = 0; i < table->size; ++i) 
+        free(items[i]);
 }
