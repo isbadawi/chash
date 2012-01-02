@@ -21,7 +21,7 @@ Insert elements with `chash_put`:
 
 Access them with `chash_get`:
 
-    chash_get(mytable, "x");
+    void *something = chash_get(mytable, "x");
 
 Check the numbers of elements by reading the `size` field:
 
