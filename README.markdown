@@ -46,3 +46,4 @@ The function must have the same signature as `free`.
     mytable->free = free;
 
 See the `chash.h` file for a full list of the functions and what they do.
+A couple of simple examples are also included.
