@@ -41,7 +41,8 @@ typedef struct {
 } chash_item;
 
 /* 
-   Creates an empty hash table.
+   Creates an empty hash table. Returns NULL if it couldn't be created
+   (i.e. because memory could not be allocated for it.)
 */
 chash* chash_new(void);
 
@@ -90,24 +91,28 @@ void chash_update(chash* dest, chash* src);
 
 /*
    Creates a copy of the given table.
+   Returns NULL if it couldn't be created.
 */
 chash* chash_copy(chash* table);
 
 /*
    Returns an array of size table->size, containing all the keys in the table
    (in the same order as that returned by chash_values).
+   Returns NULL if memory couldn't be allocated for it.
 */
 char** chash_keys(chash* table);
 
 /*
    Returns an array of size table->size, containing all the value in the table
    (in the same order as that returned by chash_keys).
+   Returns NULL if memory couldn't be allocated for it.
 */
 void** chash_values(chash* table);
 
 /*
    Returns an array of size table->size, containing all the key-value pairs in
    the table (in the same order as that returned by chash_keys and so on.)
+   Returns NULL if memory couldn't be allocated for it.
 */
 chash_item** chash_items(chash* table);
 
@@ -115,6 +120,8 @@ chash_item** chash_items(chash* table);
    Returns a string representation of this table. The to_string callback
    is called on each item (that is, with the void pointer), to turn it into
    a string. This string is freed at the end.
+
+   Returns NULL if memory couldn't be allocated for it.
 */
 char* chash_to_string(chash* table, chash_tostring_t* to_string);
 
