@@ -3,11 +3,9 @@ CLAY = clay
 chash.o: chash.c chash.h
 	gcc -c chash.c
 
-test: chash.o chashing.c
-	@$(CLAY) .
-	@gcc clay_main.c chashing.c chash.o -o chash_tests
-	@./chash_tests
-	@rm clay_main.c chash_tests clay.h
+test: chash.o tests/chashing.c
+	gcc -I. -Itests chash.o tests/clar.c tests/main.c tests/chashing.c -o tests/run_tests
+	tests/run_tests
 
 clean:
-	rm -f *.o
+	rm -f *.o test/*.o tests/run_tests

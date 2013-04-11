@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<string.h>
-#include "clay.h"
+#include "clar.h"
 #include "chash.h"
 
 chash* table;
