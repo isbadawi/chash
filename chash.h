@@ -14,9 +14,7 @@ typedef struct chash_entry {
 typedef void  (chash_callback_t) (void*);
 
 /*
-    The main hash table structure. You'd do best to treat this as an opaque
-    structure -- you might run into trouble if you mess with the fields
-    directly (feel free to read the size field though!).
+    The main hash table structure. Should be considered opaque.
 */
 typedef struct {
     /* The table proper. */
@@ -62,6 +60,11 @@ void chash_put(chash* table, char* key, void *data);
    exist in the table. 
 */
 void* chash_get(chash* table, char* key);
+
+/*
+   Returns the size (i.e. the number of entries) in the given table.
+*/
+unsigned long chash_size(chash* table);
 
 /*
    Checks if the table contains the given key -- returns 1 if yes, 0 if not.

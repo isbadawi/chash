@@ -92,16 +92,16 @@ int main(int argc, char* argv[])
     chash_iterator iter;
     chash_iterator_init(&iter, table);
     char *key; void *value;
-    pair* pairs = malloc(table->size * sizeof(*pairs));
+    pair* pairs = malloc(chash_size(table) * sizeof(*pairs));
     int i = 0;
     while (chash_iterator_next(&iter, &key, &value)) {
       pairs[i].key = key;
       pairs[i].value = value;
       i++;
     }
-    qsort(pairs, table->size, sizeof(pair), compare_by_frequency);
+    qsort(pairs, chash_size(table), sizeof(pair), compare_by_frequency);
     printf("Words sorted by frequency:\n");
-    for (i = 0; i < table->size; ++i)
+    for (i = 0; i < chash_size(table); ++i)
         printf("%s: %d\n", pairs[i].key, *((int*)pairs[i].value));
     chash_free(table);
     return 0;

@@ -22,7 +22,7 @@ void test_chashing__cleanup(void) {
 
 void test_chashing__new_chash(void) {
     cl_assert_(table != NULL, "chash_new returns NULL");
-    cl_assert_(table->size == 0, "chash_new returns table with non-zero size");
+    cl_assert_(chash_size(table) == 0, "chash_new returns table with non-zero size");
 }
 
 void test_chashing__get_missing_key(void) {
@@ -77,7 +77,7 @@ void test_chashing__clear(void) {
     chash_put(table, "z", "test");
     chash_clear(table);
     cl_assert_(items_deleted == 3, "chash_clear doesn't remove every item");
-    cl_assert_(table->size == 0, "chash_clear doesn't leave the table empty");
+    cl_assert_(chash_size(table) == 0, "chash_clear doesn't leave the table empty");
 }
 
 void test_chashing__copy(void) {
@@ -85,7 +85,7 @@ void test_chashing__copy(void) {
     chash_put(table, "y", "test2");
     chash_put(table, "z", "test3");
     chash* copy = chash_copy(table);
-    cl_assert_(copy->size == table->size, "chash_copy doesn't preserve size");
+    cl_assert_(chash_size(copy) == chash_size(table), "chash_copy doesn't preserve size");
 
     chash_iterator orig_iter;
     chash_iterator_init(&orig_iter, table);

@@ -105,6 +105,10 @@ void* chash_get(chash* table, char* key) {
     return NULL;
 }
 
+unsigned long chash_size(chash* table) {
+  return table->size;
+}
+
 int chash_contains_key(chash* table, char *key) {
     return chash_get(table, key) != NULL;
 }
