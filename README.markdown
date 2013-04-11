@@ -45,7 +45,7 @@ chash_del(mytable, "x");
 
 Iterate over the entries using a `chash_iterator`:
 
-```
+```c
 chash_iterator iter;
 chash_iterator_init(&iter, mytable);
 char *key; void *value;
