@@ -9,41 +9,65 @@ Using chash
 
 Start by including `chash.h`:
 
-    #include<chash.h>
+```c
+#include<chash.h>
+```
 
 Each hash table is an instance of `chash`. Create one with `chash_new`:
 
-    chash* mytable = chash_new();
+```c
+chash* mytable = chash_new();
+```
 
 Insert elements with `chash_put`:
 
-    chash_put(mytable, "x", something);
+```c
+chash_put(mytable, "x", something);
+```
 
 Access them with `chash_get`:
 
-    void *something = chash_get(mytable, "x");
+```c
+void *something = chash_get(mytable, "x");
+```
 
 Check the numbers of elements by reading the `size` field:
 
-    int size = mytable->size;
+```c
+int size = mytable->size;
+```
 
 Remove them with `chash_del`:
 
-    chash_del(mytable, "x");
+```c
+chash_del(mytable, "x");
+```
 
-And free a table with `chash_free`:
+Iterate over the entries using a `chash_iterator`:
 
-    chash_free(mytable);
+```
+chash_iterator iter;
+chash_iterator_init(&iter, mytable);
+char *key; void *value;
+while (chash_iterator_next(&iter, &key, &value)) {
+    /* Do something with key and value here.
+       Note it is safe to call chash_del(mytable, key) here.  */
+}
+```
+
+Free a table with `chash_free`:
+
+```c
+chash_free(mytable);
+```
 
 A `chash` doesn't assume anything about the data stored within it. In
 particular, it won't `free` a pointer if it's removed (either through
 `chash_del`, `chash_free` or a duplicate key in `chash_put`). Instead, you
 can specify a function to call, which is set by default to a no-op. 
-The function must have the same signature as `free`.
+The function must have the same signature as `free`, e.g.
 
-    #include<stdlib.h>
-    ...
-    mytable->free = free;
-
-See the `chash.h` file for a full list of the functions and what they do.
-A couple of simple examples are also included.
+```c
+chash *mytable = chash_new();
+mytable->free = free;
+```

@@ -12,7 +12,6 @@ typedef struct chash_entry {
 } chash_entry;
 
 typedef void  (chash_callback_t) (void*);
-typedef char* (chash_tostring_t) (void*);
 
 /*
     The main hash table structure. You'd do best to treat this as an opaque
@@ -33,12 +32,13 @@ typedef struct {
 } chash;
 
 /*
-    Key-value pair -- the return type of chash_items. Useful e.g. for qsort.
+    An iterator over a hash table.
 */
 typedef struct {
-    char* key;
-    void *data;
-} chash_item;
+  chash* table;
+  int i;
+  chash_entry* entry;
+} chash_iterator;
 
 /* 
    Creates an empty hash table. Returns NULL if it couldn't be created
@@ -79,8 +79,7 @@ int chash_contains_value(chash* table, void* data);
 void chash_del(chash* table, char* key);
 
 /*
-   Removes every mapping from the hash_table. Equivalent to calling chash_del
-   on every key returned by chash_keys.
+   Removes every mapping from the hash_table.
 */
 void chash_clear(chash* table);
 
@@ -96,33 +95,28 @@ void chash_update(chash* dest, chash* src);
 chash* chash_copy(chash* table);
 
 /*
-   Returns an array of size table->size, containing all the keys in the table
-   (in the same order as that returned by chash_values).
-   Returns NULL if memory couldn't be allocated for it.
+   Dumps the contents of the given table (keys and value addresses)
+   to stderr. Useful for debugging.
 */
-char** chash_keys(chash* table);
+void chash_dump(chash* table);
 
 /*
-   Returns an array of size table->size, containing all the value in the table
-   (in the same order as that returned by chash_keys).
-   Returns NULL if memory couldn't be allocated for it.
+   Initializes the provided iterator, associating it with the table.
 */
-void** chash_values(chash* table);
+void chash_iterator_init(chash_iterator*, chash* table);
 
 /*
-   Returns an array of size table->size, containing all the key-value pairs in
-   the table (in the same order as that returned by chash_keys and so on.)
-   Returns NULL if memory couldn't be allocated for it.
-*/
-chash_item** chash_items(chash* table);
+   Advances the given iterator, retrieving the key and value that are pointed
+   to after the advancement.
 
-/*
-   Returns a string representation of this table. The to_string callback
-   is called on each item (that is, with the void pointer), to turn it into
-   a string. This string is freed at the end.
+   Returns 0 if there are no more elements, or 1 otherwise.
+   If 0 is returned, key and data are not set, and the iterator is
+   no longer valid. (It may be reinitialized by another call to
+   chash_iterator_init).
 
-   Returns NULL if memory couldn't be allocated for it.
+   Note that calling chash_del on the retrieved key is allowed, and will
+   not invalidate the iterator.
 */
-char* chash_to_string(chash* table, chash_tostring_t* to_string);
+int chash_iterator_next(chash_iterator* iterator, char** key, void **data);
 
 #endif 

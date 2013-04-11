@@ -63,61 +63,6 @@ void test_chashing__contains(void) {
     cl_assert_(chash_contains_value(table, "somestring"), "chash_contains_value returns 0 for existing value");
 }
 
-void array_contains(char* str, char** array, int size) {
-    while (size--) {
-        if (!strcmp(array[size], str)) {
-            return;
-        }
-    }
-    cl_fail("chash_keys is missing a key");
-}
-
-void test_chashing__get_all_keys(void) {
-    int x = 4;
-    char y = 'a';
-    chash_put(table, "x", &x);
-    chash_put(table, "y", &y);
-    chash_put(table, "test", "test");
-    char** keys = chash_keys(table);
-    array_contains("x", keys, 3);
-    array_contains("y", keys, 3);
-    array_contains("test", keys, 3);
-}
-
-void test_chashing__get_all_keys_and_values(void) {
-    int x = 4;
-    int y = 5;
-    int test = 6;
-    chash_put(table, "x", &x);
-    chash_put(table, "y", &y);
-    chash_put(table, "test", &test);
-    char** keys = chash_keys(table);    
-    void** values = chash_values(table);
-    int i;
-    for (i = 0; i < table->size; ++i) {
-        int expected_val = *((int*)values[i]);
-        int actual_val = *CHASH_GET_AS(int, table, keys[i]);
-        cl_assert_(expected_val == actual_val, "chash_keys and chash_values don't return items in the same order");
-    }
-}
-
-void test_chashing__get_items(void) {
-    int x = 4;
-    int y = 5;
-    int test = 6;
-    chash_put(table, "x", &x);
-    chash_put(table, "y", &y);
-    chash_put(table, "test", &test);
-    char** keys = chash_keys(table);    
-    void** values = chash_values(table);
-    chash_item** items = chash_items(table);
-    int i; 
-    for (i = 0; i < table->size; ++i) {
-        cl_assert_(!strcmp(items[i]->key, keys[i]), "chash_items returns keys in wrong order");
-        cl_assert_(values[i] == items[i]->data, "chash_items returns values in wrong order");
-    }
-}
-
 void test_chashing__put_put_del_put(void) {
     chash_put(table, "x", "test");
     chash_put(table, "x", "test2");
@@ -141,12 +86,19 @@ void test_chashing__copy(void) {
     chash_put(table, "z", "test3");
     chash* copy = chash_copy(table);
     cl_assert_(copy->size == table->size, "chash_copy doesn't preserve size");
-    chash_item** original_items = chash_items(table);
-    chash_item** copied_items = chash_items(copy);
-    int i;
-    for (i = 0; i < table->size; ++i) {
-        cl_assert_(!strcmp(original_items[i]->key, copied_items[i]->key) &&
-                   original_items[i]->data == copied_items[i]->data,
+
+    chash_iterator orig_iter;
+    chash_iterator_init(&orig_iter, table);
+    chash_iterator copy_iter;
+    chash_iterator_init(&copy_iter, copy);
+    char *orig_key;
+    char *copy_key;
+    void *orig_value;
+    void *copy_value;
+    while (chash_iterator_next(&orig_iter, &orig_key, &orig_value) &&
+           chash_iterator_next(&copy_iter, &copy_key, &copy_value)) {
+        cl_assert_(!strcmp(orig_key, copy_key) &&
+                   orig_value == copy_value,
                    "chash_copy doesn't preserve items");
     }
 }

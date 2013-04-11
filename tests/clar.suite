@@ -4,9 +4,6 @@ extern void test_chashing__get_existing_key(void);
 extern void test_chashing__put_same_key_twice(void);
 extern void test_chashing__delete_key(void);
 extern void test_chashing__contains(void);
-extern void test_chashing__get_all_keys(void);
-extern void test_chashing__get_all_keys_and_values(void);
-extern void test_chashing__get_items(void);
 extern void test_chashing__put_put_del_put(void);
 extern void test_chashing__clear(void);
 extern void test_chashing__copy(void);
@@ -19,9 +16,6 @@ static const struct clar_func _clar_cb_chashing[] = {
     { "put_same_key_twice", &test_chashing__put_same_key_twice },
     { "delete_key", &test_chashing__delete_key },
     { "contains", &test_chashing__contains },
-    { "get_all_keys", &test_chashing__get_all_keys },
-    { "get_all_keys_and_values", &test_chashing__get_all_keys_and_values },
-    { "get_items", &test_chashing__get_items },
     { "put_put_del_put", &test_chashing__put_put_del_put },
     { "clear", &test_chashing__clear },
     { "copy", &test_chashing__copy }
@@ -31,8 +25,8 @@ static struct clar_suite _clar_suites[] = {
         "chashing",
         { "initialize", &test_chashing__initialize },
         { "cleanup", &test_chashing__cleanup },
-        _clar_cb_chashing, 12, 1
+        _clar_cb_chashing, 9, 1
     }
 };
 static const size_t _clar_suite_count = 1;
-static const size_t _clar_callback_count = 12;
+static const size_t _clar_callback_count = 9;

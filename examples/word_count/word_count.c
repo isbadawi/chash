@@ -8,13 +8,20 @@
 #include<sys/stat.h>
 #include<unistd.h>
 
+typedef struct {
+  char *key;
+  void *value;
+} pair;
+
 int compare_by_frequency(const void* p1, const void* p2)
 {
-    int data1 = *((int*)((*((chash_item**)p1))->data));
-    int data2 = *((int*)((*((chash_item**)p2))->data));
-    if (data1 < data2)
+    pair pair1 = *((pair*) p1);
+    pair pair2 = *((pair*) p2);
+    int val1 = *((int*) pair1.value);
+    int val2 = *((int*) pair2.value);
+    if (val1 < val2)
         return 1;
-    else if (data1 == data2)
+    else if (val1 == val2)
         return 0;
     return -1;
 }
@@ -81,12 +88,21 @@ int main(int argc, char* argv[])
         }
         token = strtok(NULL, " \t\n");
     }
-    chash_item** items = chash_items(table);
-    qsort(items, table->size, sizeof(chash_item*), compare_by_frequency);
+
+    chash_iterator iter;
+    chash_iterator_init(&iter, table);
+    char *key; void *value;
+    pair* pairs = malloc(table->size * sizeof(*pairs));
+    int i = 0;
+    while (chash_iterator_next(&iter, &key, &value)) {
+      pairs[i].key = key;
+      pairs[i].value = value;
+      i++;
+    }
+    qsort(pairs, table->size, sizeof(pair), compare_by_frequency);
     printf("Words sorted by frequency:\n");
-    int i;
     for (i = 0; i < table->size; ++i)
-        printf("%s: %d\n", items[i]->key, *((int*)items[i]->data));
+        printf("%s: %d\n", pairs[i].key, *((int*)pairs[i].value));
     chash_free(table);
     return 0;
 }

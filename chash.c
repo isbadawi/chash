@@ -110,15 +110,16 @@ int chash_contains_key(chash* table, char *key) {
 }
 
 int chash_contains_value(chash* table, void *data) {
-    void** values = chash_values(table);
-    int i;
-    for (i = 0; i < table->size; ++i) {
-        if (values[i] == data) {
-            break;
+    chash_iterator iter;
+    chash_iterator_init(&iter, table);
+    char* key;
+    void* value;
+    while (chash_iterator_next(&iter, &key, &value)) {
+        if (value == data) {
+            return 1;
         }
     }
-    free(values);
-    return i < table->size;
+    return 0;
 }
 
 void chash_del(chash* table, char* key) {
@@ -139,28 +140,26 @@ void chash_del(chash* table, char* key) {
 }
 
 void chash_clear(chash* table) {
-    char **keys = chash_keys(table);
-    int i;
-    /* chash_del modifies table->size */
-    int size = table->size;
-    for (i = 0; i < size; ++i) {
-        chash_del(table, keys[i]);
+    chash_iterator iter;
+    chash_iterator_init(&iter, table);
+    char* key;
+    void* value;
+    while (chash_iterator_next(&iter, &key, &value)) {
+      chash_del(table, key);
     }
-    free(keys);
 }
 
 void chash_update(chash* dest, chash* src) {
-    chash_item **items = chash_items(src);
-    int i;
-    for (i = 0; i < src->size; ++i) {
-        chash_put(dest, items[i]->key, items[i]->data);
-        free(items[i]);
+    chash_iterator iter;
+    chash_iterator_init(&iter, src);
+    char* key;
+    void* value;
+    while (chash_iterator_next(&iter, &key, &value)) {
+      chash_put(dest, key, value);
     }
-    free(items);
 }
 
-chash* chash_copy(chash *table)
-{
+chash* chash_copy(chash *table) {
     chash* result = chash_new();
     if (result == NULL) {
         return NULL;
@@ -168,115 +167,33 @@ chash* chash_copy(chash *table)
     chash_update(result, table);
     return result;
 }
-
-char** chash_keys(chash* table) {
-    char** keys = malloc(table->size * sizeof(*keys));
-    if (keys == NULL) {
-        return NULL;
-    }
-    int key = 0;
-    int i;
-    chash_entry* head;
-    for (i = 0; i < HASH_SIZE; ++i) {
-        for (head = table->table[i]->next; head != NULL; head = head->next) {
-            keys[key++] = head->key;
-        }
-    }
-    return keys;
+ 
+void chash_iterator_init(chash_iterator* iterator, chash* table) {
+  iterator->table = table;
+  iterator->i = -1;
+  iterator->entry = NULL;
 }
 
-void** chash_values(chash* table) {
-    void** values = malloc(table->size * sizeof(*values));
-    if (values == NULL) {
-        return NULL;
+int chash_iterator_next(chash_iterator* iterator, char** key, void **data) {
+  while (iterator->entry == NULL) {
+    iterator->i++;
+    if (iterator->i == HASH_SIZE) {
+      return 0;
     }
-    int value = 0;
-    int i;
-    for (i = 0; i < HASH_SIZE; ++i) {
-        chash_entry* head;
-        for (head = table->table[i]->next; head != NULL; head = head->next) {
-            values[value++] = head->data;
-        }
-    }
-    return values;
-}      
-
-chash_item** chash_items(chash* table) {
-    chash_item** items = malloc(table->size * sizeof(*items));
-    if (items == NULL) {
-        return NULL;
-    }
-    int item = 0;
-    int i;
-    for (i = 0; i < HASH_SIZE; ++i) {
-        chash_entry* head;
-        for (head = table->table[i]->next; head != NULL; head = head->next) {
-            items[item] = malloc(sizeof(*(items[item])));
-            if (items[item] == NULL) {
-                int j;
-                for (j = 0; j < item; ++j) {
-                    free(items[j]);
-                }
-                free(items);
-                return NULL;
-            }
-            items[item]->key = head->key;
-            items[item]->data = head->data;
-            item++;
-        }
-    }
-    return items;
+    iterator->entry = iterator->table->table[iterator->i]->next;
+  }
+  *key = iterator->entry->key;
+  *data = iterator->entry->data;
+  iterator->entry = iterator->entry->next;
+  return 1;
 }
 
-char* chash_to_string(chash* table, chash_tostring_t* to_string) {
-    char** keys = chash_keys(table);
-    if (keys == NULL) {
-        return NULL;
+void chash_dump(chash* table) {
+    chash_iterator iter;
+    chash_iterator_init(&iter, table);
+    char* key;
+    void *value;
+    while (chash_iterator_next(&iter, &key, &value)) {
+      fprintf(stderr, "%s: %p\n", key, value);
     }
-    void** values = chash_values(table);
-    if (values == NULL) {
-        free(keys);
-        return NULL;
-    }
-    char** strings = malloc(table->size * sizeof(*strings));
-    if (strings == NULL) {
-        free(keys);
-        free(values);
-        return NULL;
-    }
-    int length = 0;
-    int i;
-    for (i = 0; i < table->size; ++i) {
-        strings[i] = to_string(values[i]);
-        length += strlen(keys[i]);
-        length += strlen(strings[i]);
-        length += 6; /* quotes for the key, colon & space separators, comma, space */
-    }
-    /* -2 for the trailing comma & space, +2 for the braces */
-
-    char *result = malloc(length + 1);
-    if (result == NULL) {
-        int j;
-        for (j = 0; j < table->size; ++j) {
-            free(strings[j]);
-        }
-        free(keys);
-        free(values);
-        free(strings);
-        return NULL;
-    }
-
-    strcpy(result, "{");
-    int from = 1;
-    for (i = 0; i < table->size; ++i) {
-        from += sprintf(result + from, "\"%s\": %s", keys[i], strings[i]);    
-        if (i != table->size - 1) {
-            from += sprintf(result + from, ", ");
-        }
-        free(strings[i]);
-    }
-    strcpy(result + from, "}");
-    free(keys);
-    free(values);
-    return result;
 }
