@@ -31,10 +31,10 @@ Access them with `chash_get`:
 void *something = chash_get(mytable, "x");
 ```
 
-Check the numbers of elements by reading the `size` field:
+Check the numbers of elements with `chash_size`:
 
 ```c
-int size = mytable->size;
+int size = chash_size(mytable);
 ```
 
 Remove them with `chash_del`:
